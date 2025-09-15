@@ -1,13 +1,13 @@
-# Chat with Vid
+# Chat with Video
 
-A web application that allows users to upload YouTube videos and chat with an AI assistant about the video content using Google's Gemini API.
+This project is a web application that allows users to engage in a conversational chat with any YouTube video. By submitting a video URL, users can ask questions, request summaries, and extract key information directly from the video's content, transforming a passive viewing experience into an interactive knowledge base.
 
 ## Features
-
-- Upload YouTube videos by URL
-- AI-powered chat interface to discuss video content
-- Real-time processing and analysis of video transcripts
-- Docker-based development and deployment
+- **Process YouTube Videos**: Submit any public YouTube URL to begin.
+- **AI-Powered Analysis**: Automatically generates a concise summary, a list of actionable items, and suggested questions based on the video's transcript.
+- **Interactive Chat**: Engage in a conversation with the video's content. The AI uses the transcript as its context, providing relevant and focused answers.
+- **Streaming Responses**: AI responses are streamed in real-time for a dynamic, conversational feel.
+- **Local Chat History**: All conversations are saved on your local machine, allowing you to review or continue them later.
 
 ## Technology Stack
 
@@ -215,7 +215,7 @@ The application is designed to run in Docker containers. For production deployme
 
 ## License
 
-[Add your license information here]
+This project is licensed under the MIT License. See the `LICENSE` file for details.
 
 ## Support
 
