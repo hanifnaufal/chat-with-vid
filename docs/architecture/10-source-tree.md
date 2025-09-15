@@ -32,6 +32,6 @@ chat-with-vid/
 │   └── shared-types/         # (Optional) For sharing types between FE/BE
 │
 ├── .gitignore
-├── docker-compose.yml        # For PostgreSQL database
+├── docker-compose.yml        # For Fast API, NextJs, and PostgreSQL database
 └── README.md
 ```
