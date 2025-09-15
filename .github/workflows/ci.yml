@@ -1,0 +1,82 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+  backend-ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/api
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+    
+    - name: Install Poetry
+      run: |
+        pip install poetry
+    
+    - name: Cache Poetry dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/pypoetry
+          ./apps/api/.venv
+        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-
+    
+    - name: Install dependencies
+      run: |
+        poetry install
+    
+    - name: Run Ruff linting
+      run: |
+        poetry run ruff check .
+    
+    - name: Run Black formatting
+      run: |
+        poetry run black --check .
+    
+    - name: Run tests
+      run: |
+        poetry run pytest
+
+  frontend-ci:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./apps/web
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 'lts/*'
+        cache: 'npm'
+        cache-dependency-path: ./apps/web/package-lock.json
+    
+    - name: Install dependencies
+      run: |
+        npm ci
+    
+    - name: Run ESLint
+      run: |
+        npm run lint
+    
+    - name: Run tests
+      run: |
+        echo "No test script defined in package.json"
