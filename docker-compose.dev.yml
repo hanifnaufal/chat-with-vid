@@ -45,9 +45,11 @@ services:
     volumes:
       - ./apps/web:/app
       - /app/node_modules
+      - next_cache:/app/.next
     depends_on:
       - api
     command: npm run dev
 
 volumes:
   postgres_data:
+  next_cache:
