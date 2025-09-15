@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "chat-with-vid-api"
+version = "0.1.0"
+description = "FastAPI backend for Chat with Vid"
+authors = ["Your Name <you@example.com>"]
+packages = [
+    { include = "app" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.111.0"
+uvicorn = "^0.29.0"
+sqlalchemy = "^2.0.0"
+psycopg = "^3.0.0"
+langchain = "^0.2.0"
+langchain-google-genai = "^1.0.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+ruff = "^0.4.0"
+black = "^24.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
