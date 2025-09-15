@@ -42,8 +42,9 @@ A web application that allows users to upload YouTube videos and chat with an AI
    cp apps/web/.env.local.example apps/web/.env.local
    ```
    
-   Edit `apps/api/.env` and add your Google Gemini API key:
+   Edit `apps/api/.env` and configure your environment variables:
    ```
+   POSTGRES_PASSWORD=your_secure_database_password_here
    GOOGLE_API_KEY=your_google_gemini_api_key_here
    ```
 
@@ -55,7 +56,7 @@ A web application that allows users to upload YouTube videos and chat with an AI
 4. **Access the application:**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:8000
-   - Database: postgresql://postgres:postgres@localhost:5432/chat_with_vid
+   - Database: postgresql://postgres:${POSTGRES_PASSWORD}@localhost:5432/chat_with_vid
 
 ### Development Mode
 
