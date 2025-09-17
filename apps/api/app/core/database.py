@@ -4,7 +4,9 @@ from sqlalchemy.orm import sessionmaker
 import os
 
 # Use DATABASE_URL from environment variables
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/dbname")
+SQLALCHEMY_DATABASE_URL = os.getenv(
+    "DATABASE_URL", "postgresql://user:password@localhost/dbname"
+)
 
 # Only create the engine when actually needed to avoid connection issues during import
 engine = None

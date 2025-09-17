@@ -23,4 +23,6 @@ class Chat(Base):
     actionable_items = Column(JSON)  # JSONB in PostgreSQL
     suggested_questions = Column(JSON)  # JSONB in PostgreSQL
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
-    updated_at = Column(DateTime, server_default=func.now(), nullable=False, onupdate=func.now())
+    updated_at = Column(
+        DateTime, server_default=func.now(), nullable=False, onupdate=func.now()
+    )
