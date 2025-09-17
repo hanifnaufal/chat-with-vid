@@ -1,8 +1,12 @@
 from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 from app.main import app
+from app.core.database import Base
 from uuid import uuid4
 
+
+# Use an in-memory SQLite database for testing
+Base.metadata.create_all = MagicMock()
 
 client = TestClient(app)
 

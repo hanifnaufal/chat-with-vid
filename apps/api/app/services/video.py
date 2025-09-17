@@ -96,7 +96,7 @@ def get_youtube_metadata(video_id: str) -> dict:
             metadata = {
                 "title": info.get("title", "Unknown Title"),
                 "channel_name": info.get("uploader", "Unknown Channel"),
-                "publication_date": None, 
+                "publication_date": None,
                 "view_count": info.get("view_count", 0),
                 "thumbnail_url": info.get("thumbnail", ""),
             }

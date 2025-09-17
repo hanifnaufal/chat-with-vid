@@ -132,13 +132,11 @@ def test_start_new_chat(chat_service):
 
     chat_service.chat_repository.create_chat = MagicMock(return_value=mock_chat)
 
-    # Mock asyncio.create_task to avoid actual async task creation
-    with patch("app.services.chat.asyncio.create_task") as mock_create_task:
-        chat_id = chat_service.start_new_chat(source_url)
+    # Call the method
+    chat_id = chat_service.start_new_chat(source_url)
 
-        # Assertions
-        assert chat_id == str(mock_chat.id)
-        chat_service.chat_repository.create_chat.assert_called_once_with(
-            source_url, "YOUTUBE"
-        )
-        mock_create_task.assert_called_once()
+    # Assertions
+    assert chat_id == str(mock_chat.id)
+    chat_service.chat_repository.create_chat.assert_called_once_with(
+        source_url, "YOUTUBE", "dQw4w9WgXcQ"
+    )
