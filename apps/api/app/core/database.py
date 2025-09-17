@@ -1,9 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import os
 
-# This is a placeholder. In a real application, you would use environment variables.
-SQLALCHEMY_DATABASE_URL = "postgresql://user:password@localhost/dbname"
+# Use DATABASE_URL from environment variables
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/dbname")
 
 # Only create the engine when actually needed to avoid connection issues during import
 engine = None
