@@ -190,6 +190,11 @@ If you prefer to run services directly without Docker:
 - **Backend**: Uses pytest for testing
 - Run tests with: `poetry run pytest`
 
+- **Frontend**: Uses Jest with React Testing Library
+- Run tests with: `npm test`
+- Run tests in watch mode: `npm run test:watch`
+- Generate coverage report: `npm run test:coverage`
+
 ### Database
 
 The PostgreSQL database is automatically set up with Docker. For direct access:
