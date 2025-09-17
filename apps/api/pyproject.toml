@@ -8,14 +8,14 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.13,<3.14"
 fastapi = "^0.111.0"
 uvicorn = "^0.29.0"
 sqlalchemy = "^2.0.0"
 psycopg2-binary = "^2.9.0"
 langchain = "^0.2.0"
 langchain-google-genai = "^1.0.0"
-youtube-transcript-api = "^0.6.0"
+youtube-transcript-api = "^1.2.0"
 pytube = "^15.0.0"
 
 [tool.poetry.group.dev.dependencies]
