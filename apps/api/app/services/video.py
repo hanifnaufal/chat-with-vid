@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 from youtube_transcript_api import YouTubeTranscriptApi
 from youtube_transcript_api.formatters import TextFormatter
 from youtube_transcript_api._errors import (
@@ -7,7 +8,8 @@ from youtube_transcript_api._errors import (
     TranscriptsDisabled,
     CouldNotRetrieveTranscript,
 )
-from pytube import YouTube
+import yt_dlp
+from yt_dlp.utils import DownloadError, ExtractorError
 from ..core.exceptions import VideoProcessingError
 from ..core.logging import setup_logging
 
@@ -35,53 +37,98 @@ def get_youtube_transcript(video_id: str) -> str:
     try:
         ytt_api = YouTubeTranscriptApi()
         transcript_list = ytt_api.fetch(video_id)
-        
+
         formatter = TextFormatter()
         formatted_transcript = formatter.format_transcript(transcript_list)
-        
+
         logger.debug(
             "YouTube transcript retrieved successfully",
-            extra={"video_id": video_id, "transcript_length": len(formatted_transcript)}
+            extra={
+                "video_id": video_id,
+                "transcript_length": len(formatted_transcript),
+            },
         )
         return formatted_transcript
-    except (NoTranscriptFound, VideoUnavailable, TranscriptsDisabled, CouldNotRetrieveTranscript) as e:
+    except (
+        NoTranscriptFound,
+        VideoUnavailable,
+        TranscriptsDisabled,
+        CouldNotRetrieveTranscript,
+    ) as e:
         logger.error(
             "Failed to retrieve transcript",
             extra={"video_id": video_id, "error": str(e)},
             exc_info=True,
         )
-        raise VideoProcessingError(f"Failed to retrieve transcript for video {video_id}: {str(e)}")
+        raise VideoProcessingError(
+            f"Failed to retrieve transcript for video {video_id}: {str(e)}"
+        )
     except Exception as e:
         logger.error(
             "Unexpected error while retrieving transcript",
             extra={"video_id": video_id, "error": str(e)},
             exc_info=True,
         )
-        raise VideoProcessingError(f"Unexpected error while retrieving transcript for video {video_id}: {str(e)}")
+        raise VideoProcessingError(
+            f"Unexpected error while retrieving transcript for video {video_id}: {str(e)}"
+        )
 
 
 def get_youtube_metadata(video_id: str) -> dict:
-    """Retrieve YouTube video metadata."""
-    logger.debug("Retrieving YouTube metadata", extra={"video_id": video_id})
+    """Retrieve YouTube video metadata using yt-dlp."""
+    logger.debug(
+        "Retrieving YouTube metadata with yt-dlp", extra={"video_id": video_id}
+    )
     try:
-        yt = YouTube(f"https://www.youtube.com/watch?v={video_id}")
-        metadata = {
-            "title": yt.title if hasattr(yt, 'title') else "Unknown Title",
-            "channel_name": yt.author if hasattr(yt, 'author') else "Unknown Channel",
-            "publication_date": yt.publish_date if hasattr(yt, 'publish_date') else None,
-            "view_count": yt.views if hasattr(yt, 'views') else 0,
-            "thumbnail_url": yt.thumbnail_url if hasattr(yt, 'thumbnail_url') else "",
+        # Configure yt-dlp options for metadata extraction
+        ydl_opts = {
+            "skip_download": True,
+            "quiet": True,
+            "no_warnings": True,
+            "extract_flat": "in_playlist",
         }
+
+        # Extract metadata using yt-dlp
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            video_url = f"https://www.youtube.com/watch?v={video_id}"
+            info = ydl.extract_info(video_url, download=False)
+
+            metadata = {
+                "title": info.get("title", "Unknown Title"),
+                "channel_name": info.get("uploader", "Unknown Channel"),
+                "publication_date": None, 
+                "view_count": info.get("view_count", 0),
+                "thumbnail_url": info.get("thumbnail", ""),
+            }
+
+            timestamp = info.get("timestamp")
+            if timestamp:
+                try:
+                    metadata["publication_date"] = datetime.fromtimestamp(timestamp)
+                except (ValueError, OSError, OverflowError):
+                    metadata["publication_date"] = None
+
         logger.debug(
-            "YouTube metadata retrieved successfully",
+            "YouTube metadata retrieved successfully with yt-dlp",
             extra={"video_id": video_id, "metadata_keys": list(metadata.keys())},
         )
         return metadata
-    except Exception as e:
+
+    except (DownloadError, ExtractorError) as e:
         logger.error(
-            "Failed to retrieve metadata",
+            "Failed to retrieve metadata with yt-dlp",
             extra={"video_id": video_id, "error": str(e)},
             exc_info=True,
         )
-        # Raise the exception to be caught by the calling function
-        raise VideoProcessingError(f"Failed to retrieve metadata for video {video_id}: {str(e)}")
+        raise VideoProcessingError(
+            f"Failed to retrieve metadata for video {video_id}: {str(e)}"
+        )
+    except Exception as e:
+        logger.error(
+            "Unexpected error while retrieving metadata with yt-dlp",
+            extra={"video_id": video_id, "error": str(e)},
+            exc_info=True,
+        )
+        raise VideoProcessingError(
+            f"Unexpected error while retrieving metadata for video {video_id}: {str(e)}"
+        )

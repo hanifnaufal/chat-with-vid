@@ -1,9 +1,8 @@
-import asyncio
-from ..repository.chat import ChatRepository
 from sqlalchemy.orm import Session
+from ..core.logging import setup_logging
+from ..repository.chat import ChatRepository
 from .video import extract_video_id, get_youtube_transcript, get_youtube_metadata
 from ..core.exceptions import VideoProcessingError
-from ..core.logging import setup_logging
 
 logger = setup_logging()
 
@@ -26,11 +25,13 @@ class ChatService:
             video_id = extract_video_id(source_url)
         except VideoProcessingError:
             video_id = "unknown"
-            
+
         # Create chat with video_id
         chat = self.chat_repository.create_chat(source_url, source_type, video_id)
         chat_id = str(chat.id)
-        logger.info("Chat record created", extra={"chat_id": chat_id, "video_id": video_id})
+        logger.info(
+            "Chat record created", extra={"chat_id": chat_id, "video_id": video_id}
+        )
         return chat_id
 
     async def process_video_async(self, chat_id: str, source_url: str):

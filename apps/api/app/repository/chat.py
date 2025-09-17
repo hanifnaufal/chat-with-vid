@@ -9,7 +9,9 @@ class ChatRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_chat(self, source_url: str, source_type: str = "YOUTUBE", video_id: str = "unknown") -> Chat:
+    def create_chat(
+        self, source_url: str, source_type: str = "YOUTUBE", video_id: str = "unknown"
+    ) -> Chat:
         """Create a new chat record with processing status."""
         db_chat = Chat(
             id=uuid4(),
