@@ -30,81 +30,34 @@ def extract_video_id(url: str) -> str:
 
 
 def get_youtube_transcript(video_id: str) -> str:
-    """Retrieve YouTube video transcript."""
+    """Retrieve and format YouTube video transcript."""
     logger.debug("Retrieving YouTube transcript", extra={"video_id": video_id})
     try:
-        # Try to get the transcript with a preference for English, but fall back to any available language
-        transcript_data = YouTubeTranscriptApi.get_transcript(video_id, languages=['en'])
+        ytt_api = YouTubeTranscriptApi()
+        transcript_list = ytt_api.fetch(video_id)
         
         formatter = TextFormatter()
-        transcript = formatter.format_transcript(transcript_data)
+        formatted_transcript = formatter.format_transcript(transcript_list)
         
         logger.debug(
             "YouTube transcript retrieved successfully",
-            extra={"video_id": video_id, "transcript_length": len(transcript)},
+            extra={"video_id": video_id, "transcript_length": len(formatted_transcript)}
         )
-        return transcript
-    except NoTranscriptFound:
-        logger.warning(
-            "No transcript found for video in preferred language, trying any available language",
-            extra={"video_id": video_id},
-        )
-        try:
-            # Try to get transcript in any available language
-            transcript_data = YouTubeTranscriptApi.get_transcript(video_id)
-            
-            formatter = TextFormatter()
-            transcript = formatter.format_transcript(transcript_data)
-            
-            logger.debug(
-                "YouTube transcript retrieved successfully (using non-English language)",
-                extra={"video_id": video_id, "transcript_length": len(transcript)},
-            )
-            return transcript
-        except NoTranscriptFound:
-            logger.error(
-                "No transcript found for video in any language",
-                extra={"video_id": video_id},
-            )
-            raise VideoProcessingError(f"No transcript available for video {video_id}")
-        except (VideoUnavailable, TranscriptsDisabled):
-            logger.error(
-                "Video is unavailable or transcripts are disabled",
-                extra={"video_id": video_id},
-            )
-            raise VideoProcessingError(f"Video {video_id} is unavailable or transcripts are disabled")
-        except CouldNotRetrieveTranscript as e:
-            logger.error(
-                "Could not retrieve transcript for video",
-                extra={"video_id": video_id, "error": str(e)},
-            )
-            raise VideoProcessingError(f"Failed to retrieve transcript for video {video_id}: {str(e)}")
-        except Exception as e:
-            logger.error(
-                "Unexpected error retrieving transcript",
-                extra={"video_id": video_id, "error": str(e)},
-                exc_info=True,
-            )
-            raise VideoProcessingError(f"Failed to retrieve transcript for video {video_id}: {str(e)}")
-    except (VideoUnavailable, TranscriptsDisabled):
+        return formatted_transcript
+    except (NoTranscriptFound, VideoUnavailable, TranscriptsDisabled, CouldNotRetrieveTranscript) as e:
         logger.error(
-            "Video is unavailable or transcripts are disabled",
-            extra={"video_id": video_id},
-        )
-        raise VideoProcessingError(f"Video {video_id} is unavailable or transcripts are disabled")
-    except CouldNotRetrieveTranscript as e:
-        logger.error(
-            "Could not retrieve transcript for video",
-            extra={"video_id": video_id, "error": str(e)},
-        )
-        raise VideoProcessingError(f"Failed to retrieve transcript for video {video_id}: {str(e)}")
-    except Exception as e:
-        logger.error(
-            "Unexpected error retrieving transcript",
+            "Failed to retrieve transcript",
             extra={"video_id": video_id, "error": str(e)},
             exc_info=True,
         )
         raise VideoProcessingError(f"Failed to retrieve transcript for video {video_id}: {str(e)}")
+    except Exception as e:
+        logger.error(
+            "Unexpected error while retrieving transcript",
+            extra={"video_id": video_id, "error": str(e)},
+            exc_info=True,
+        )
+        raise VideoProcessingError(f"Unexpected error while retrieving transcript for video {video_id}: {str(e)}")
 
 
 def get_youtube_metadata(video_id: str) -> dict:
@@ -130,12 +83,5 @@ def get_youtube_metadata(video_id: str) -> dict:
             extra={"video_id": video_id, "error": str(e)},
             exc_info=True,
         )
-        # Return default metadata instead of failing completely
-        metadata = {
-            "title": "Unknown Title",
-            "channel_name": "Unknown Channel",
-            "publication_date": None,
-            "view_count": 0,
-            "thumbnail_url": "",
-        }
-        return metadata
+        # Raise the exception to be caught by the calling function
+        raise VideoProcessingError(f"Failed to retrieve metadata for video {video_id}: {str(e)}")

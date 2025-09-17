@@ -22,23 +22,38 @@ def test_extract_video_id_invalid_url():
         extract_video_id(url)
 
 
+@patch("app.services.video.TextFormatter")
 @patch("app.services.video.YouTubeTranscriptApi")
-def test_get_youtube_transcript(mock_youtube_transcript_api):
+def test_get_youtube_transcript(mock_youtube_transcript_api, mock_text_formatter):
     """Test retrieving YouTube transcript."""
+    # Create a mock for the YouTubeTranscriptApi instance
+    mock_ytt_api_instance = MagicMock()
     mock_transcript_list = [{"text": "Hello"}, {"text": "World"}]
-    mock_youtube_transcript_api.get_transcript.return_value = mock_transcript_list
+    mock_ytt_api_instance.fetch.return_value = mock_transcript_list
+    mock_youtube_transcript_api.return_value = mock_ytt_api_instance
+    
+    # Mock the TextFormatter to return a specific formatted string
+    mock_formatter_instance = MagicMock()
+    mock_formatter_instance.format_transcript.return_value = "Hello World"
+    mock_text_formatter.return_value = mock_formatter_instance
 
     video_id = "dQw4w9WgXcQ"
     expected_transcript = "Hello World"
 
     assert get_youtube_transcript(video_id) == expected_transcript
-    mock_youtube_transcript_api.get_transcript.assert_called_once_with(video_id)
+    mock_youtube_transcript_api.assert_called_once()
+    mock_ytt_api_instance.fetch.assert_called_once_with(video_id)
+    mock_text_formatter.assert_called_once()
+    mock_formatter_instance.format_transcript.assert_called_once_with(mock_transcript_list)
 
 
 @patch("app.services.video.YouTubeTranscriptApi")
 def test_get_youtube_transcript_error(mock_youtube_transcript_api):
     """Test handling errors when retrieving YouTube transcript."""
-    mock_youtube_transcript_api.get_transcript.side_effect = Exception("API Error")
+    # Create a mock for the YouTubeTranscriptApi instance
+    mock_ytt_api_instance = MagicMock()
+    mock_ytt_api_instance.fetch.side_effect = Exception("API Error")
+    mock_youtube_transcript_api.return_value = mock_ytt_api_instance
 
     video_id = "dQw4w9WgXcQ"
 
