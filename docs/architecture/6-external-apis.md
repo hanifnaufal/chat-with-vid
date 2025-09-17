@@ -18,6 +18,10 @@
 
 - **Rate Limits**: There are no official, published rate limits. However, making an excessive number of requests in a short period can lead to temporary IP-based blocking. We must consider this a potential operational risk.
 
-- **Key Endpoints Used**: N/A (Library-based). The primary function will be similar to YouTubeTranscriptApi.get_transcript(video_id).
+- **Key Endpoints Used**: N/A (Library-based). The primary function will be similar to:
+  ```python
+  ytt_api = YouTubeTranscriptApi()
+  transcript = ytt_api.fetch(video_id)
+  ```
 
 - **Integration Notes**: This functionality will be encapsulated within the Video Processing Service component and run as an asynchronous background task.

@@ -10,3 +10,11 @@ class InvalidURLException(ChatWithVidException):
     def __init__(self, message: str = "Invalid URL provided"):
         self.message = message
         super().__init__(self.message)
+
+
+class VideoProcessingError(ChatWithVidException):
+    """Exception raised for errors during video processing."""
+
+    def __init__(self, message: str = "Error processing video"):
+        self.message = message
+        super().__init__(self.message)

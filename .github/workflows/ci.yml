@@ -7,8 +7,33 @@ on:
     branches: [ main ]
 
 jobs:
+  # Path filtering job to determine which files changed
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.filter.outputs.api }}
+      web: ${{ steps.filter.outputs.web }}
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch all history for proper comparison
+    - uses: dorny/paths-filter@v3
+      id: filter
+      with:
+        filters: |
+          api:
+            - 'apps/api/**'
+          web:
+            - 'apps/web/**'
+    - name: Debug filter outputs
+      run: |
+        echo "API changed: ${{ steps.filter.outputs.api }}"
+        echo "Web changed: ${{ steps.filter.outputs.web }}"
+
   backend-ci:
-    if: ${{ github.event_name == 'push' || contains(github.event.pull_request.changed_files.*.filename, 'apps/api/') }}
+    needs: changes
+    # Only run this job if files in apps/api/ changed
+    if: ${{ needs.changes.outputs.api == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -21,7 +46,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.12'
+        python-version: '3.13'
 
     - name: Install Poetry
       run: |
@@ -54,7 +79,9 @@ jobs:
         poetry run pytest
 
   frontend-ci:
-    if: ${{ github.event_name == 'push' || contains(github.event.pull_request.changed_files.*.filename, 'apps/web/') }}
+    needs: changes
+    # Only run this job if files in apps/web/ changed
+    if: ${{ needs.changes.outputs.web == 'true' }}
     runs-on: ubuntu-latest
     defaults:
       run:
