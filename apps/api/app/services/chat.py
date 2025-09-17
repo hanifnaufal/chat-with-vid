@@ -3,6 +3,9 @@ from ..repository.chat import ChatRepository
 from sqlalchemy.orm import Session
 from .video import extract_video_id, get_youtube_transcript, get_youtube_metadata
 from ..core.exceptions import VideoProcessingError
+from ..core.logging import setup_logging
+
+logger = setup_logging()
 
 
 class ChatService:
@@ -14,19 +17,40 @@ class ChatService:
         Start a new chat by creating a chat record.
         Returns the chat ID as a string.
         """
+        logger.info(
+            "Starting new chat",
+            extra={"source_url": source_url, "source_type": source_type},
+        )
         chat = self.chat_repository.create_chat(source_url, source_type)
+        chat_id = str(chat.id)
+        logger.info("Chat record created", extra={"chat_id": chat_id})
         # Start asynchronous video processing
-        asyncio.create_task(self.process_video_async(str(chat.id), source_url))
-        return str(chat.id)
+        asyncio.create_task(self.process_video_async(chat_id, source_url))
+        return chat_id
 
     async def process_video_async(self, chat_id: str, source_url: str):
         """
         Asynchronously process the video to retrieve transcript and metadata.
         """
+        logger.info(
+            "Starting asynchronous video processing",
+            extra={"chat_id": chat_id, "source_url": source_url},
+        )
         try:
             video_id = extract_video_id(source_url)
+            logger.debug(
+                "Extracted video ID", extra={"chat_id": chat_id, "video_id": video_id}
+            )
             transcript = get_youtube_transcript(video_id)
+            logger.debug(
+                "Retrieved YouTube transcript",
+                extra={"chat_id": chat_id, "transcript_length": len(transcript)},
+            )
             metadata = get_youtube_metadata(video_id)
+            logger.debug(
+                "Retrieved YouTube metadata",
+                extra={"chat_id": chat_id, "metadata_keys": list(metadata.keys())},
+            )
 
             # Update chat record with results
             self.chat_repository.update_chat(
@@ -39,7 +63,16 @@ class ChatService:
                 view_count=metadata["view_count"],
                 thumbnail_url=metadata["thumbnail_url"],
             )
+            logger.info(
+                "Chat record updated successfully",
+                extra={"chat_id": chat_id, "status": "processed"},
+            )
         except VideoProcessingError as e:
+            logger.error(
+                "Video processing error",
+                extra={"chat_id": chat_id, "error": str(e)},
+                exc_info=True,
+            )
             # Update chat record with error status
             self.chat_repository.update_chat(
                 chat_id=chat_id,
@@ -47,6 +80,11 @@ class ChatService:
                 transcript=f"Error processing video: {str(e)}",
             )
         except Exception as e:
+            logger.error(
+                "Unexpected error during video processing",
+                extra={"chat_id": chat_id, "error": str(e)},
+                exc_info=True,
+            )
             # Handle any other unexpected errors
             self.chat_repository.update_chat(
                 chat_id=chat_id,
