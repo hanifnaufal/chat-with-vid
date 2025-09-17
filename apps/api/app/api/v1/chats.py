@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from pydantic import ValidationError
 
@@ -14,7 +14,7 @@ router = APIRouter()
 
 
 @router.post("/chats", status_code=status.HTTP_202_ACCEPTED)
-def create_chat(chat_request: ChatCreateRequest, db: Session = Depends(get_db)):
+def create_chat(chat_request: ChatCreateRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     """
     Create a new chat for processing a YouTube video.
     """
@@ -30,6 +30,8 @@ def create_chat(chat_request: ChatCreateRequest, db: Session = Depends(get_db)):
         chat_id = chat_service.start_new_chat(
             str(chat_request.source_url), chat_request.source_type
         )
+        # Add the video processing as a background task
+        background_tasks.add_task(chat_service.process_video_async, chat_id, str(chat_request.source_url))
         logger.info("Chat creation initiated successfully", extra={"chat_id": chat_id})
         return {"chat_id": chat_id}
     except InvalidURLException as e:

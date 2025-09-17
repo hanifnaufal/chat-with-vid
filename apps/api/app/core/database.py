@@ -18,6 +18,8 @@ def get_engine():
     global engine
     if engine is None:
         engine = create_engine(SQLALCHEMY_DATABASE_URL)
+        # Create all tables
+        Base.metadata.create_all(bind=engine)
     return engine
 
 

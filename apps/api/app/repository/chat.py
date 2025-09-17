@@ -9,12 +9,13 @@ class ChatRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_chat(self, source_url: str, source_type: str = "YOUTUBE") -> Chat:
+    def create_chat(self, source_url: str, source_type: str = "YOUTUBE", video_id: str = "unknown") -> Chat:
         """Create a new chat record with processing status."""
         db_chat = Chat(
             id=uuid4(),
             source_url=source_url,
             source_type=source_type,
+            video_id=video_id,
             status="processing",
         )
         self.db.add(db_chat)
@@ -36,6 +37,7 @@ class ChatRepository:
         publication_date: Optional[datetime] = None,
         view_count: Optional[int] = None,
         thumbnail_url: Optional[str] = None,
+        video_id: Optional[str] = None,
     ) -> Chat:
         """Update a chat record with processing results."""
         db_chat = self.get_chat_by_id(chat_id)
@@ -54,6 +56,8 @@ class ChatRepository:
                 db_chat.view_count = view_count
             if thumbnail_url is not None:
                 db_chat.thumbnail_url = thumbnail_url
+            if video_id is not None:
+                db_chat.video_id = video_id
             self.db.commit()
             self.db.refresh(db_chat)
         return db_chat

@@ -21,11 +21,16 @@ class ChatService:
             "Starting new chat",
             extra={"source_url": source_url, "source_type": source_type},
         )
-        chat = self.chat_repository.create_chat(source_url, source_type)
+        # Extract video ID for storage
+        try:
+            video_id = extract_video_id(source_url)
+        except VideoProcessingError:
+            video_id = "unknown"
+            
+        # Create chat with video_id
+        chat = self.chat_repository.create_chat(source_url, source_type, video_id)
         chat_id = str(chat.id)
-        logger.info("Chat record created", extra={"chat_id": chat_id})
-        # Start asynchronous video processing
-        asyncio.create_task(self.process_video_async(chat_id, source_url))
+        logger.info("Chat record created", extra={"chat_id": chat_id, "video_id": video_id})
         return chat_id
 
     async def process_video_async(self, chat_id: str, source_url: str):
