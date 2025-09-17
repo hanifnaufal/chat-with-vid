@@ -12,9 +12,26 @@ on:
       - 'apps/api/**'
       - 'apps/web/**'
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
+  debug-changes:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Debug event information
+      run: |
+        echo "Event name: ${{ github.event_name }}"
+        echo "Base ref: ${{ github.base_ref }}"
+        echo "Head ref: ${{ github.head_ref }}"
+        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+          echo "Changed files:"
+          echo "${{ toJSON(github.event.pull_request.changed_files) }}"
+        fi
+        
   backend-ci:
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files.*.filename, 'apps/api/')) }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files.*.filename, 'apps/api/') != '') }}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -60,7 +77,7 @@ jobs:
         poetry run pytest
 
   frontend-ci:
-    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files.*.filename, 'apps/web/')) }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'pull_request' && contains(github.event.pull_request.changed_files.*.filename, 'apps/web/') != '') }}
     runs-on: ubuntu-latest
     defaults:
       run:
