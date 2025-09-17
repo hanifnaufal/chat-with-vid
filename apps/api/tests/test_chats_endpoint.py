@@ -1,9 +1,7 @@
-import pytest
 from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 from app.main import app
 from uuid import uuid4
-import asyncio
 
 
 client = TestClient(app)
@@ -16,7 +14,8 @@ def test_create_chat_valid_url(mock_chat_service):
     mock_chat_service.return_value.start_new_chat.return_value = str(uuid4())
 
     response = client.post(
-        "/api/v1/chats", json={"source_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+        "/api/v1/chats",
+        json={"source_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
     )
 
     assert response.status_code == 202
@@ -26,7 +25,9 @@ def test_create_chat_valid_url(mock_chat_service):
 
 def test_create_chat_invalid_url():
     """Test creating a chat with an invalid URL."""
-    response = client.post("/api/v1/chats", json={"source_url": "https://www.google.com"})
+    response = client.post(
+        "/api/v1/chats", json={"source_url": "https://www.google.com"}
+    )
 
     # FastAPI validates the URL format before our custom validation
     # Our custom validation only works for valid URLs that don't match YouTube pattern
@@ -54,14 +55,15 @@ def test_create_chat_async_processing(mock_chat_service):
     mock_service_instance = MagicMock()
     mock_chat_service.return_value = mock_service_instance
     mock_chat_service.return_value.start_new_chat.return_value = str(uuid4())
-    
+
     # We won't directly test the asyncio.create_task call here as it's challenging to mock
     # and the main goal is to ensure the endpoint returns the correct status code.
     # The actual async processing is tested in the service tests.
     response = client.post(
-        "/api/v1/chats", json={"source_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"}
+        "/api/v1/chats",
+        json={"source_url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"},
     )
-    
+
     # Assertions
     assert response.status_code == 202
 
