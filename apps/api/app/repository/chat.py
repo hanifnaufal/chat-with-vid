@@ -13,7 +13,7 @@ class ChatRepository:
             id=uuid4(),
             source_url=source_url,
             source_type=source_type,
-            status="processing"
+            status="processing",
         )
         self.db.add(db_chat)
         self.db.commit()

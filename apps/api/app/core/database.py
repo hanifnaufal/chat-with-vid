@@ -21,7 +21,9 @@ def get_engine():
 def get_session_local():
     global SessionLocal
     if SessionLocal is None:
-        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=get_engine())
+        SessionLocal = sessionmaker(
+            autocommit=False, autoflush=False, bind=get_engine()
+        )
     return SessionLocal
 
 

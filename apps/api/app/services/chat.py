@@ -1,4 +1,3 @@
-from uuid import UUID
 from ..repository.chat import ChatRepository
 from sqlalchemy.orm import Session
 
