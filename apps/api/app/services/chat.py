@@ -3,6 +3,7 @@ from ..core.logging import setup_logging
 from ..repository.chat import ChatRepository
 from .video import extract_video_id, get_youtube_transcript, get_youtube_metadata
 from ..core.exceptions import VideoProcessingError
+from uuid import UUID
 
 logger = setup_logging()
 
@@ -33,6 +34,27 @@ class ChatService:
             "Chat record created", extra={"chat_id": chat_id, "video_id": video_id}
         )
         return chat_id
+
+    def get_chat_by_id(self, chat_id: str):
+        """
+        Retrieve a chat by its ID.
+        """
+        logger.info("Retrieving chat", extra={"chat_id": chat_id})
+        try:
+            # Validate UUID format
+            UUID(chat_id)
+        except ValueError:
+            logger.error("Invalid chat ID format", extra={"chat_id": chat_id})
+            raise ValueError("Invalid chat ID format")
+
+        chat = self.chat_repository.get_chat_by_id(chat_id)
+
+        if not chat:
+            logger.error("Chat not found", extra={"chat_id": chat_id})
+            raise ValueError("Chat not found")
+
+        logger.info("Chat retrieved successfully", extra={"chat_id": chat_id})
+        return chat
 
     async def process_video_async(self, chat_id: str, source_url: str):
         """
