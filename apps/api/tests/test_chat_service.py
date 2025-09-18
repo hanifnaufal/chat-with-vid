@@ -6,7 +6,7 @@ from app.services.chat import ChatService
 from app.repository.chat import ChatRepository
 from app.models.chat import Chat
 from app.core.exceptions import VideoProcessingError
-from uuid import uuid4
+from uuid import uuid4, UUID
 from datetime import datetime
 
 
@@ -140,3 +140,68 @@ def test_start_new_chat(chat_service):
     chat_service.chat_repository.create_chat.assert_called_once_with(
         source_url, "YOUTUBE", "dQw4w9WgXcQ"
     )
+
+
+@patch("app.services.chat.extract_video_id")
+def test_start_new_chat_extract_video_id_error(mock_extract_id, chat_service):
+    """Test starting a new chat when extract_video_id fails."""
+    # Setup mocks
+    source_url = "https://www.youtube.com/watch?v=invalid"
+    mock_chat = MagicMock(spec=Chat)
+    mock_chat.id = uuid4()
+
+    mock_extract_id.side_effect = VideoProcessingError("Invalid YouTube URL")
+    chat_service.chat_repository.create_chat = MagicMock(return_value=mock_chat)
+
+    # Call the method
+    chat_id = chat_service.start_new_chat(source_url)
+
+    # Assertions
+    assert chat_id == str(mock_chat.id)
+    chat_service.chat_repository.create_chat.assert_called_once_with(
+        source_url, "YOUTUBE", "unknown"
+    )
+
+
+def test_get_chat_by_id_success(chat_service):
+    """Test successful retrieval of a chat by ID."""
+    # Setup mocks
+    chat_id = str(uuid4())
+    mock_chat = MagicMock(spec=Chat)
+    mock_chat.id = UUID(chat_id)
+
+    chat_service.chat_repository.get_chat_by_id.return_value = mock_chat
+
+    # Call the method
+    result = chat_service.get_chat_by_id(chat_id)
+
+    # Assertions
+    assert result == mock_chat
+    chat_service.chat_repository.get_chat_by_id.assert_called_once_with(chat_id)
+
+
+def test_get_chat_by_id_invalid_uuid(chat_service):
+    """Test handling of invalid UUID format."""
+    # Setup
+    invalid_chat_id = "invalid-uuid"
+
+    # Call the method and assert exception
+    with pytest.raises(ValueError, match="Invalid chat ID format"):
+        chat_service.get_chat_by_id(invalid_chat_id)
+
+    # Verify repository method was not called
+    chat_service.chat_repository.get_chat_by_id.assert_not_called()
+
+
+def test_get_chat_by_id_not_found(chat_service):
+    """Test handling of non-existent chat ID."""
+    # Setup
+    chat_id = str(uuid4())
+    chat_service.chat_repository.get_chat_by_id.return_value = None
+
+    # Call the method and assert exception
+    with pytest.raises(ValueError, match="Chat not found"):
+        chat_service.get_chat_by_id(chat_id)
+
+    # Verify repository method was called
+    chat_service.chat_repository.get_chat_by_id.assert_called_once_with(chat_id)
