@@ -83,7 +83,7 @@ class ChatService:
             # Update chat record with results
             self.chat_repository.update_chat(
                 chat_id=chat_id,
-                status="processed",
+                status="complete",
                 transcript=transcript,
                 title=metadata["title"],
                 channel_name=metadata["channel_name"],
@@ -93,7 +93,7 @@ class ChatService:
             )
             logger.info(
                 "Chat record updated successfully",
-                extra={"chat_id": chat_id, "status": "processed"},
+                extra={"chat_id": chat_id, "status": "complete"},
             )
         except VideoProcessingError as e:
             logger.error(
