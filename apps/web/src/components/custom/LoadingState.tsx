@@ -14,8 +14,10 @@ interface LoadingStateProps extends React.HTMLAttributes<HTMLDivElement> {
 const LoadingState = React.forwardRef<HTMLDivElement, LoadingStateProps>(
   ({ className, status, currentStep = 1, totalSteps = 3, message, ...props }, ref) => {
     const getStepMessage = () => {
+      // If a custom message is provided, use it
       if (message) return message;
       
+      // Otherwise, use step-specific messages
       switch (currentStep) {
         case 1:
           return "Fetching transcript...";
@@ -29,6 +31,11 @@ const LoadingState = React.forwardRef<HTMLDivElement, LoadingStateProps>(
     };
 
     const getStatusMessage = () => {
+      // If a custom message is provided for failed status, use it
+      if (status === "failed" && message) {
+        return message;
+      }
+      
       switch (status) {
         case "pending":
           return "Starting processing...";
@@ -42,6 +49,9 @@ const LoadingState = React.forwardRef<HTMLDivElement, LoadingStateProps>(
           return "Processing...";
       }
     };
+
+    // Determine if we should show the bouncing dots animation
+    const showAnimation = status === "processing" || status === "pending";
 
     return (
       <Card className={cn("w-full max-w-2xl", className)} ref={ref} {...props}>
@@ -66,13 +76,13 @@ const LoadingState = React.forwardRef<HTMLDivElement, LoadingStateProps>(
           <div className="h-2 w-full max-w-xs overflow-hidden rounded-full bg-gray-200">
             <div
               className={cn(
-                "h-full bg-primary transition-all duration-500",
+                "h-full transition-all duration-500",
                 status === "failed" ? "bg-red-500" : "bg-primary"
               )}
               style={{ width: `${(currentStep / totalSteps) * 100}%` }}
             />
           </div>
-          {status === "processing" && (
+          {showAnimation && (
             <div className="flex items-center space-x-1">
               <div className="h-2 w-2 animate-bounce rounded-full bg-primary [animation-delay:-0.3s]"></div>
               <div className="h-2 w-2 animate-bounce rounded-full bg-primary [animation-delay:-0.15s]"></div>

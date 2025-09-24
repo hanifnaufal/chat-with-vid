@@ -2,8 +2,8 @@
 // Custom error for better error handling
 export class HttpError extends Error {
   response: Response;
-  data: any;
-  constructor(response: Response, data: any) {
+  data: unknown;
+  constructor(response: Response, data: unknown) {
     super(`HTTP Error: ${response.status} ${response.statusText}`);
     this.response = response;
     this.data = data;

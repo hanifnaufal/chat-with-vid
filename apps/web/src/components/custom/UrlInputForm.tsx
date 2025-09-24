@@ -6,15 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-interface UrlInputFormProps extends React.HTMLAttributes<HTMLDivElement> {
+interface UrlInputFormProps {
   onSubmit: (url: string) => void;
   isLoading?: boolean;
+  error?: string;
+  className?: string;
 }
 
 const UrlInputForm = React.forwardRef<HTMLDivElement, UrlInputFormProps>(
-  ({ className, onSubmit, isLoading = false, ...props }, ref) => {
+  ({ className, onSubmit, isLoading = false, error, ...props }, ref) => {
     const [url, setUrl] = React.useState("");
-    const [error, setError] = React.useState("");
+    const [validationError, setValidationError] = React.useState("");
 
     const validateUrl = (input: string): boolean => {
       try {
@@ -28,19 +30,24 @@ const UrlInputForm = React.forwardRef<HTMLDivElement, UrlInputFormProps>(
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       
+      // Clear previous errors
+      setValidationError("");
+      
       if (!url.trim()) {
-        setError("Please enter a YouTube URL");
+        setValidationError("Please enter a YouTube URL");
         return;
       }
 
       if (!validateUrl(url)) {
-        setError("Please enter a valid YouTube URL");
+        setValidationError("Please enter a valid YouTube URL");
         return;
       }
 
-      setError("");
       onSubmit(url);
     };
+
+    // Show either validation error or error from parent
+    const displayError = validationError || error;
 
     return (
       <Card className={cn("w-full max-w-md", className)} ref={ref} {...props}>
@@ -59,10 +66,10 @@ const UrlInputForm = React.forwardRef<HTMLDivElement, UrlInputFormProps>(
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 disabled={isLoading}
-                className={error ? "border-red-500" : ""}
+                className={displayError ? "border-red-500" : ""}
               />
-              {error && (
-                <p className="text-sm text-red-500">{error}</p>
+              {displayError && (
+                <p className="text-sm text-red-500">{displayError}</p>
               )}
             </div>
             <Button 
