@@ -12,7 +12,7 @@ servers:
     description: Local development server
 
 paths:
-  /api/chats:
+  /api/v1/chats:
     post:
       summary: "Submit a new source URL for processing"
       requestBody:
@@ -52,7 +52,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ChatSummary'
 
-  /api/chats/{chat_id}:
+  /api/v1/chats/{chat_id}:
     get:
       summary: "Get a specific chat session"
       parameters:
@@ -70,7 +70,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Chat'
 
-  /api/chats/{chat_id}/messages:
+  /api/v1/chats/{chat_id}/messages:
     post:
       summary: "Send a message to a chat session"
       parameters:
@@ -122,7 +122,7 @@ components:
           format: uuid
         status:
           type: string
-          enum: [processing, complete, failed]
+          enum: [processing, completed, failed]
         title:
           type: string
         channel_name:

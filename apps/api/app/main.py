@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from .api.v1 import chats as chats_router
 from .core.logging import setup_logging
 import time
@@ -7,6 +8,14 @@ import time
 logger = setup_logging()
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Include API routers
 app.include_router(chats_router.router, prefix="/api/v1", tags=["chats"])

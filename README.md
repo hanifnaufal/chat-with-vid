@@ -12,7 +12,7 @@ This project is a web application that allows users to engage in a conversationa
 ## Technology Stack
 
 - **Frontend**: Next.js 14 with React Server Components
-- **Backend**: FastAPI with Python 3.12
+- **Backend**: FastAPI with Python 3.13
 - **Database**: PostgreSQL 16
 - **AI**: Google Gemini API via LangChain
 - **Containerization**: Docker and Docker Compose

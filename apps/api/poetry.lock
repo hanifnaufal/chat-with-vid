@@ -422,6 +422,27 @@ dnspython = ">=2.0.0"
 idna = ">=2.0.0"
 
 [[package]]
+name = "environs"
+version = "14.3.0"
+description = "simplified environment variable parsing"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "environs-14.3.0-py3-none-any.whl", hash = "sha256:91e4c4ea964be277855cdd83a588f6375f10fad9fa452660ecb9f503c230f26a"},
+    {file = "environs-14.3.0.tar.gz", hash = "sha256:20672d92db325ce8114872b1989104eb84f083486325b5a44bcddff56472a384"},
+]
+
+[package.dependencies]
+marshmallow = ">=3.18.0"
+python-dotenv = "*"
+
+[package.extras]
+dev = ["environs[tests]", "pre-commit (>=4.0,<5.0)", "tox"]
+django = ["dj-database-url", "dj-email-url", "django-cache-url"]
+tests = ["backports.strenum ; python_version < \"3.11\"", "environs[django]", "packaging", "pytest"]
+
+[[package]]
 name = "fastapi"
 version = "0.111.1"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
@@ -467,6 +488,22 @@ uvicorn = {version = ">=0.15.0", extras = ["standard"]}
 [package.extras]
 standard = ["fastapi-cloud-cli (>=0.1.1)", "uvicorn[standard] (>=0.15.0)"]
 standard-no-fastapi-cloud-cli = ["uvicorn[standard] (>=0.15.0)"]
+
+[[package]]
+name = "fastapi-cors"
+version = "0.0.6"
+description = "Simple env support of CORS settings for Fastapi applications"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "fastapi-cors-0.0.6.tar.gz", hash = "sha256:17eeb92f2b3dd8f0deb8ca69f031760e35edd5a0c811aaf80f9743e5e6ae50a1"},
+    {file = "fastapi_cors-0.0.6-py3-none-any.whl", hash = "sha256:d116b482c682f9c5330f04b1c49a9d504f3a9df6373bc43dd6c31f3b9d0b8b15"},
+]
+
+[package.dependencies]
+environs = ">=9.5.0"
+fastapi = ">=0.99.1"
 
 [[package]]
 name = "frozenlist"
@@ -1278,6 +1315,23 @@ files = [
     {file = "MarkupSafe-3.0.2-cp39-cp39-win_amd64.whl", hash = "sha256:6e296a513ca3d94054c2c881cc913116e90fd030ad1c656b3869762b754f5f8a"},
     {file = "markupsafe-3.0.2.tar.gz", hash = "sha256:ee55d3edf80167e48ea11a923c7386f4669df67d7994554387f84e7d8b0a2bf0"},
 ]
+
+[[package]]
+name = "marshmallow"
+version = "4.0.1"
+description = "A lightweight library for converting complex datatypes to and from native Python datatypes."
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "marshmallow-4.0.1-py3-none-any.whl", hash = "sha256:72f14ef346f81269dbddee891bac547dda1501e9e08b6a809756ea3dbb7936a1"},
+    {file = "marshmallow-4.0.1.tar.gz", hash = "sha256:e1d860bd262737cb2d34e1541b84cb52c32c72c9474e3fe6f30f137ef8b0d97f"},
+]
+
+[package.extras]
+dev = ["marshmallow[tests]", "pre-commit (>=3.5,<5.0)", "tox"]
+docs = ["autodocsumm (==0.2.14)", "furo (==2025.7.19)", "sphinx (==8.2.3)", "sphinx-copybutton (==0.5.2)", "sphinx-issues (==5.0.1)", "sphinxext-opengraph (==0.12.0)"]
+tests = ["pytest", "simplejson"]
 
 [[package]]
 name = "mdurl"
@@ -2928,27 +2982,27 @@ requests = "*"
 
 [[package]]
 name = "yt-dlp"
-version = "2024.12.23"
+version = "2025.9.23"
 description = "A feature-rich command-line audio/video downloader"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
 files = [
-    {file = "yt_dlp-2024.12.23-py3-none-any.whl", hash = "sha256:2fc08a5221a0379628ac4e7324c6c69a95b9fdfa7a7ca3187444b3b7451e38be"},
-    {file = "yt_dlp-2024.12.23.tar.gz", hash = "sha256:ac0e72b5a9017ba104b4258546201a7cedc38e8bd20727e0c63b77c829b425e9"},
+    {file = "yt_dlp-2025.9.23-py3-none-any.whl", hash = "sha256:84e36acf2dfbadb307d734a590dd937923173b13c57cf45a662f40c93e746302"},
+    {file = "yt_dlp-2025.9.23.tar.gz", hash = "sha256:9282ad1deadb4c90b2e6d3bcf9f360abf88c5f2e4ba836dad7b51387b086d757"},
 ]
 
 [package.extras]
-build = ["build", "hatchling", "pip", "setuptools (>=71.0.2)", "wheel"]
-curl-cffi = ["curl-cffi (==0.5.10) ; os_name == \"nt\" and implementation_name == \"cpython\"", "curl-cffi (>=0.5.10,!=0.6.*,<0.7.2) ; os_name != \"nt\" and implementation_name == \"cpython\""]
-default = ["brotli ; implementation_name == \"cpython\"", "brotlicffi ; implementation_name != \"cpython\"", "certifi", "mutagen", "pycryptodomex", "requests (>=2.32.2,<3)", "urllib3 (>=1.26.17,<3)", "websockets (>=13.0)"]
-dev = ["autopep8 (>=2.0,<3.0)", "pre-commit", "pytest (>=8.1,<9.0)", "pytest-rerunfailures (>=14.0,<15.0)", "ruff (>=0.8.0,<0.9.0)"]
-pyinstaller = ["pyinstaller (>=6.11.1)"]
+build = ["build", "hatchling (>=1.27.0)", "pip", "setuptools (>=71.0.2,<81)", "wheel"]
+curl-cffi = ["curl-cffi (>=0.5.10,<0.6.dev0 || >=0.10.dev0,<0.14) ; implementation_name == \"cpython\""]
+default = ["brotli ; implementation_name == \"cpython\"", "brotlicffi ; implementation_name != \"cpython\"", "certifi", "mutagen", "pycryptodomex", "requests (>=2.32.2,<3)", "urllib3 (>=2.0.2,<3)", "websockets (>=13.0)"]
+dev = ["autopep8 (>=2.0,<3.0)", "pre-commit", "pytest (>=8.1,<9.0)", "pytest-rerunfailures (>=14.0,<15.0)", "ruff (>=0.13.0,<0.14.0)"]
+pyinstaller = ["pyinstaller (>=6.13.0)"]
 secretstorage = ["cffi", "secretstorage"]
-static-analysis = ["autopep8 (>=2.0,<3.0)", "ruff (>=0.8.0,<0.9.0)"]
+static-analysis = ["autopep8 (>=2.0,<3.0)", "ruff (>=0.13.0,<0.14.0)"]
 test = ["pytest (>=8.1,<9.0)", "pytest-rerunfailures (>=14.0,<15.0)"]
 
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "8cf56eefa9891684bd99863b54d711ae4230bb825a24570a3965b22cc404f65f"
+content-hash = "a5f0fa042047fcd5ca9327cc1cba4adcfa5688fa48ba5d39610074b2b4b38d47"

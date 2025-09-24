@@ -83,7 +83,7 @@ class ChatService:
             # Update chat record with results
             self.chat_repository.update_chat(
                 chat_id=chat_id,
-                status="processed",
+                status="completed",
                 transcript=transcript,
                 title=metadata["title"],
                 channel_name=metadata["channel_name"],
@@ -93,7 +93,7 @@ class ChatService:
             )
             logger.info(
                 "Chat record updated successfully",
-                extra={"chat_id": chat_id, "status": "processed"},
+                extra={"chat_id": chat_id, "status": "completed"},
             )
         except VideoProcessingError as e:
             logger.error(
@@ -104,8 +104,7 @@ class ChatService:
             # Update chat record with error status
             self.chat_repository.update_chat(
                 chat_id=chat_id,
-                status="error",
-                transcript=f"Error processing video: {str(e)}",
+                status="failed"                
             )
         except Exception as e:
             logger.error(
@@ -116,6 +115,5 @@ class ChatService:
             # Handle any other unexpected errors
             self.chat_repository.update_chat(
                 chat_id=chat_id,
-                status="error",
-                transcript=f"Unexpected error: {str(e)}",
+                status="failed"                
             )
