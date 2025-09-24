@@ -122,7 +122,7 @@ components:
           format: uuid
         status:
           type: string
-          enum: [processing, complete, failed]
+          enum: [processing, completed, failed]
         title:
           type: string
         channel_name:

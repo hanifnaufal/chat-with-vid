@@ -12,7 +12,7 @@ This project is a web application that allows users to engage in a conversationa
 ## Technology Stack
 
 - **Frontend**: Next.js 14 with React Server Components
-- **Backend**: FastAPI with Python 3.12
+- **Backend**: FastAPI with Python 3.13
 - **Database**: PostgreSQL 16
 - **AI**: Google Gemini API via LangChain
 - **Containerization**: Docker and Docker Compose
@@ -128,16 +128,12 @@ If you prefer to run services directly without Docker:
    ```bash
    poetry install
    ```
-   
-   This will install all backend dependencies including `python-dotenv` which is used for loading environment variables from the `.env` file.
 
 4. Set up environment variables:
    ```bash
    cp .env.example .env
    # Edit .env and add your Google Gemini API key
    ```
-   
-   The application uses `python-dotenv` to load environment variables from the `.env` file.
 
 5. Run the development server:
    ```bash

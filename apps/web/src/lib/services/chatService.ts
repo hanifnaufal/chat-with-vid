@@ -7,7 +7,7 @@ export interface ChatCreationResponse {
 
 export interface Chat {
   id: string;
-  status: "processing" | "complete" | "failed";
+  status: "processing" | "completed" | "failed";
   title?: string;
   channel_name?: string;
   publication_date?: string;
